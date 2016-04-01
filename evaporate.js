@@ -1146,14 +1146,14 @@
                 xhr.onreadystatechange = function () {
 
                     if (xhr.readyState === 4) {
-
-                        if (xhr.status === 200 && xhr.response.length === 28) {
-                            l.d('authorizedSend got signature for step: \'' + authRequester.step + '\'    sig: ' + xhr.response);
-                            authRequester.auth = xhr.response;
+                        var response = xhr.response.replace(/\"/g, '');
+                        if (xhr.status === 200 && response.length === 28) {
+                            l.d('authorizedSend got signature for step: \'' + authRequester.step + '\'    sig: ' + response);
+                            authRequester.auth = response;
                             clearCurrentXhr(authRequester);
                             authRequester.onGotAuth();
                         } else {
-                            warnMsg = 'failed to get authorization (readyState=4) for ' + authRequester.step + '.  xhr.status: ' + xhr.status + '.  xhr.response: ' + xhr.response;
+                            warnMsg = 'failed to get authorization (readyState=4) for ' + authRequester.step + '.  xhr.status: ' + xhr.status + '.  xhr.response: ' + response;
                             l.w(warnMsg);
                             me.warn(warnMsg);
                             clearCurrentXhr(authRequester);
@@ -1170,7 +1170,7 @@
                 };
 
                 xhr.open('GET', url);
-                var signHeaders = makeSignParamsObject(me.signHeaders);
+                var signHeaders = con.signHeaders;
                 for (var header in signHeaders) {
                     if (!signHeaders.hasOwnProperty(header)) { continue; }
                     xhr.setRequestHeader(header, signHeaders[header])
